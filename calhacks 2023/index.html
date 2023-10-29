@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>HalalScan</title>
+</head>
+<body>
+    <!DOCTYPE html>
+    <html>
+    <body>
+        <c!DOCTYPE html>
+        <html>
+        <head>
+            <title>HalalScan</title>
+            <link rel="stylesheet" type="text/css" href="styles.css">
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>HalalScan</h1>
+                </div>
+                <div class="content">
+                    <input type="text" id="ingredientInput">
+                    <button onclick="classifyIngredient()">Submit</button>
+                    <p id="classificationResult"></p>
+                </div>
+            </div>
+            <script>
+                function classifyIngredient() {
+                    const ingredientText = document.getElementById('ingredientInput').value;
+                    const haramIngredients = ["alcohol", "pork", "ham", "bacon", "gelatin"];
+        
+                    // Check if any of the Haram ingredients are present in the text
+                    const containsHaramIngredient = haramIngredients.some(ingredient =>
+                        ingredientText.toLowerCase().includes(ingredient.toLowerCase())
+                    );
+        
+                    // Request to OpenAI GPT-3 to classify
+                    fetch('https://api.openai.com/v1/engines/davinci/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer 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',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            prompt: `If the following ingredient list includes the words alcohol, pork, ham, bacon, gelatin, output the word HARAM alone and if it doesnt include those words output the word HALAL alone: '${ingredientText}'`,
+                            max_tokens: 50
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const result = data.choices[0].text;
+        
+                        // Check if the text contains any Haram ingredients
+                        if (containsHaramIngredient) {
+                            document.getElementById('classificationResult').textContent = `Haram`;
+                        } else {
+                            document.getElementById('classificationResult').textContent = `Halal`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            </script>
+        </body>
+        </html>
+        
+    
+</body>
+</html>
